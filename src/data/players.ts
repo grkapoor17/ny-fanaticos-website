@@ -30,6 +30,9 @@ export const players: Player[] = [
   { id: "rev", name: "Revanth Pothana", number: 6, position: "Midfielder", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
   { id: "varun", name: "Varun Garu", number: 21, position: "Midfielder", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
   { id: "roger", name: "Roger Freites", number: 9, position: "Forward", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
+  { id: "miles", name: "Miles Rochester", number: 8, position: "Midfielder", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
+  { id: "max", name: "Max Rochester", number: 7, position: "Forward", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
+  { id: "lucas", name: "Lucas Vienne", number: 1, position: "Goalkeeper", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
 ];
 
 export const squadIsPlaceholder = false;
