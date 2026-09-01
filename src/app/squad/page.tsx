@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import PlaceholderImage from "@/components/PlaceholderImage";
 import PlayerCard from "@/components/PlayerCard";
+import SquadLeaders from "@/components/SquadLeaders";
 import { images } from "@/data/images";
-import { positionOrder, playersByPosition, squadIsPlaceholder } from "@/data/players";
+import { players, positionOrder, playersByPosition, squadIsPlaceholder } from "@/data/players";
 
 export const metadata: Metadata = {
   title: "Squad",
@@ -28,6 +29,8 @@ export default function SquadPage() {
               names, numbers, and photos are added.
             </p>
           )}
+
+          <SquadLeaders players={players} />
 
           {positionOrder.map((position) => {
             const group = playersByPosition(position);
