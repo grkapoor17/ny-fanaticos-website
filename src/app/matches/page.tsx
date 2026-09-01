@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import PlaceholderImage from "@/components/PlaceholderImage";
 import FixtureRow from "@/components/FixtureRow";
-import MatchResult from "@/components/MatchResult";
+import ResultsFilter from "@/components/ResultsFilter";
 import { images } from "@/data/images";
 import { fixtures, resultsByDateDesc } from "@/data/matches";
 
@@ -48,10 +48,8 @@ export default function MatchesPage() {
       <section className="border-t border-border bg-background-alt">
         <div className="mx-auto max-w-4xl px-5 py-16 sm:px-8 sm:py-24">
           <h2 className="font-display text-3xl sm:text-4xl">Results</h2>
-          <div className="mt-8 space-y-4">
-            {resultsByDateDesc.map((m) => (
-              <MatchResult key={m.id} match={m} />
-            ))}
+          <div className="mt-8">
+            <ResultsFilter results={resultsByDateDesc} />
           </div>
         </div>
       </section>
