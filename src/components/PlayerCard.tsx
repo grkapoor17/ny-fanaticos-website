@@ -1,12 +1,12 @@
 import type { Player } from "@/data/players";
 import { playerImage } from "@/data/images";
-import PlaceholderImage from "./PlaceholderImage";
+import PlayerPhoto from "./PlayerPhoto";
 
 export default function PlayerCard({ player }: { player: Player }) {
   return (
     <div className="group relative overflow-hidden border border-border bg-background-alt">
       <div className="relative aspect-[3/4]">
-        <PlaceholderImage asset={playerImage(player.id)} className="h-full w-full" />
+        <PlayerPhoto asset={playerImage(player.id)} className="h-full w-full" />
 
         <div className="absolute left-0 top-0 font-display px-3 py-1 text-4xl leading-none text-foreground/90 [text-shadow:0_2px_10px_rgba(0,0,0,0.6)] sm:text-5xl">
           {player.number}
