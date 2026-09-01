@@ -1,88 +1,69 @@
+import fs from "node:fs";
+import path from "node:path";
+
 /**
  * Centralized image config.
  *
- * V1 ships with no real club photography, so every entry points at a
- * labeled placeholder instead of a broken <img src>. Swap `src` for a real
- * file under /public once assets exist — nothing else needs to change.
+ * Drop a real file into /public matching the naming convention below and
+ * it's picked up automatically on the next build/dev reload — no code
+ * changes needed. Until a file exists, a labeled placeholder renders
+ * instead of a broken <img>.
+ *
+ * Conventions:
+ *   - Section photos: /public/images/<key>.(jpg|jpeg|png|webp)
+ *       e.g. /public/images/hero.jpg for the homepage hero
+ *   - Instagram grid: /public/images/instagram-1.jpg ... instagram-6.jpg
+ *   - Player photos: /public/players/<player-id>.(jpg|jpeg|png|webp)
+ *       <player-id> matches the `id` field in src/data/players.ts,
+ *       e.g. /public/players/gautam.jpg
+ *
+ * This is server-only (uses fs) — only import images.ts from server
+ * components (no "use client" files).
  */
 
 export type ImageAsset = {
-  /** Path under /public once a real asset exists. Null = still a placeholder. */
   src: string | null;
-  /** Shown on the placeholder block so it's obvious what to shoot/upload. */
   label: string;
   alt: string;
 };
 
+const EXTENSIONS = ["jpg", "jpeg", "png", "webp"];
+
+function resolve(relativeDir: string, basename: string): string | null {
+  for (const ext of EXTENSIONS) {
+    const filename = `${basename}.${ext}`;
+    const diskPath = path.join(process.cwd(), "public", relativeDir, filename);
+    if (fs.existsSync(diskPath)) {
+      return `/${relativeDir}/${filename}`;
+    }
+  }
+  return null;
+}
+
+function sectionImage(key: string, label: string, alt: string): ImageAsset {
+  return { src: resolve("images", key), label, alt };
+}
+
 export const images = {
-  heroHome: {
-    src: null,
-    label: "PLACEHOLDER — hero match/action photo",
-    alt: "NY Fanaticos players in action",
-  },
-  champions: {
-    src: null,
-    label: "PLACEHOLDER — trophy lift / team celebration photo",
-    alt: "NY Fanaticos celebrating the GroupStage NYC championship",
-  },
-  clubIntro: {
-    src: null,
-    label: "PLACEHOLDER — team photo or NYC pitch photo",
-    alt: "NY Fanaticos team photo",
-  },
-  clubCity: {
-    src: null,
-    label: "PLACEHOLDER — night match / NYC field photo",
-    alt: "Night match on an NYC field",
-  },
-  clubHero: {
-    src: null,
-    label: "PLACEHOLDER — editorial team portrait",
-    alt: "NY Fanaticos team portrait",
-  },
-  matchesHero: {
-    src: null,
-    label: "PLACEHOLDER — match action photo",
-    alt: "Match action",
-  },
-  squadHero: {
-    src: null,
-    label: "PLACEHOLDER — full squad photo",
-    alt: "NY Fanaticos full squad",
-  },
-  joinHero: {
-    src: null,
-    label: "PLACEHOLDER — training / open trial photo",
-    alt: "NY Fanaticos training session",
-  },
-  sponsorsHero: {
-    src: null,
-    label: "PLACEHOLDER — matchday / sponsor activation photo",
-    alt: "Matchday at Lydia's NYC",
-  },
-  lydiasLogo: {
-    src: null,
-    label: "LOGO PLACEHOLDER — Lydia's NYC",
-    alt: "Lydia's NYC logo",
-  },
-  instagramGrid: [
-    { src: null, label: "IG PLACEHOLDER 1", alt: "NY Fanaticos Instagram post" },
-    { src: null, label: "IG PLACEHOLDER 2", alt: "NY Fanaticos Instagram post" },
-    { src: null, label: "IG PLACEHOLDER 3", alt: "NY Fanaticos Instagram post" },
-    { src: null, label: "IG PLACEHOLDER 4", alt: "NY Fanaticos Instagram post" },
-    { src: null, label: "IG PLACEHOLDER 5", alt: "NY Fanaticos Instagram post" },
-    { src: null, label: "IG PLACEHOLDER 6", alt: "NY Fanaticos Instagram post" },
-  ] satisfies ImageAsset[],
-  crest: {
-    src: null,
-    label: "CREST PLACEHOLDER",
-    alt: "NY Fanaticos crest",
-  },
+  heroHome: sectionImage("hero", "PLACEHOLDER — hero match/action photo", "NY Fanaticos players in action"),
+  champions: sectionImage("champions", "PLACEHOLDER — trophy lift / team celebration photo", "NY Fanaticos celebrating the GroupStage NYC championship"),
+  clubIntro: sectionImage("club-intro", "PLACEHOLDER — team photo or NYC pitch photo", "NY Fanaticos team photo"),
+  clubCity: sectionImage("club-city", "PLACEHOLDER — night match / NYC field photo", "Night match on an NYC field"),
+  clubHero: sectionImage("club-hero", "PLACEHOLDER — editorial team portrait", "NY Fanaticos team portrait"),
+  matchesHero: sectionImage("matches-hero", "PLACEHOLDER — match action photo", "Match action"),
+  squadHero: sectionImage("squad-hero", "PLACEHOLDER — full squad photo", "NY Fanaticos full squad"),
+  joinHero: sectionImage("join-hero", "PLACEHOLDER — training / open trial photo", "NY Fanaticos training session"),
+  sponsorsHero: sectionImage("sponsors-hero", "PLACEHOLDER — matchday / sponsor activation photo", "Matchday at Lydia's NYC"),
+  lydiasLogo: sectionImage("lydias-logo", "LOGO PLACEHOLDER — Lydia's NYC", "Lydia's NYC logo"),
+  instagramGrid: [1, 2, 3, 4, 5, 6].map((n) =>
+    sectionImage(`instagram-${n}`, `IG PLACEHOLDER ${n}`, "NY Fanaticos Instagram post")
+  ),
+  crest: sectionImage("crest", "CREST PLACEHOLDER", "NY Fanaticos crest"),
 } satisfies Record<string, ImageAsset | ImageAsset[]>;
 
 export function playerImage(playerId: string): ImageAsset {
   return {
-    src: null,
+    src: resolve("players", playerId),
     label: `PLAYER PHOTO PLACEHOLDER — ${playerId}`,
     alt: `Portrait of ${playerId}`,
   };
