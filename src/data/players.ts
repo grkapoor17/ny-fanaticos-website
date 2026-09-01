@@ -1,8 +1,7 @@
 /**
  * Squad data model, built to support individual player pages and full
- * statistics later. Real roster details have not been supplied yet, so
- * every entry below is an explicit placeholder — swap in real players
- * (and their photos via images.ts) as the club provides them.
+ * statistics later. Positions are placeholder (all "Midfielder") until
+ * the club provides real ones — update as that info comes in.
  */
 
 export type Position = "Goalkeeper" | "Defender" | "Midfielder" | "Forward";
@@ -21,17 +20,19 @@ export type Player = {
 };
 
 export const players: Player[] = [
-  { id: "player-1", name: "Player Name", number: 1, position: "Goalkeeper", appearances: 0, goals: 0, assists: 0, cleanSheets: 0, captain: false, active: true },
-  { id: "player-2", name: "Player Name", number: 2, position: "Defender", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
-  { id: "player-3", name: "Player Name", number: 4, position: "Defender", appearances: 0, goals: 0, assists: 0, captain: true, active: true },
-  { id: "player-4", name: "Player Name", number: 6, position: "Midfielder", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
-  { id: "player-5", name: "Player Name", number: 8, position: "Midfielder", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
-  { id: "player-6", name: "Player Name", number: 9, position: "Forward", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
-  { id: "player-7", name: "Player Name", number: 10, position: "Forward", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
-  { id: "player-8", name: "Player Name", number: 11, position: "Forward", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
+  { id: "gautam", name: "Gautam Kapoor", number: 10, position: "Midfielder", appearances: 0, goals: 0, assists: 0, captain: true, active: true },
+  { id: "caleb", name: "Caleb Smith-Salzberg", number: 18, position: "Defender", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
+  { id: "onur", name: "Onur Gurol", number: 11, position: "Forward", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
+  { id: "ben", name: "Ben Richardson", number: 19, position: "Midfielder", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
+  { id: "vikram", name: "Vikram Arun", number: 3, position: "Defender", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
+  { id: "sriram", name: "Sriram Chidambaram", number: 33, position: "Goalkeeper", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
+  { id: "avi", name: "Avi Jaiswa;", number: 17, position: "Defender", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
+  { id: "rev", name: "Revanth Pothana", number: 6, position: "Midfielder", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
+  { id: "varun", name: "Varun Garu", number: 21, position: "Midfielder", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
+  { id: "roger", name: "Roger Freites", number: 9, position: "Forward", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
 ];
 
-export const squadIsPlaceholder = true;
+export const squadIsPlaceholder = false;
 
 export const positionOrder: Position[] = ["Goalkeeper", "Defender", "Midfielder", "Forward"];
 
