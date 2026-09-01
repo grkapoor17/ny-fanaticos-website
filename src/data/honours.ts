@@ -6,8 +6,8 @@ export type Honour = {
 
 export const honours: Honour[] = [
   {
-    season: "2026",
-    competition: "GroupStage NYC",
+    season: "2026 Summer",
+    competition: "GroupStage D1",
     result: "Champions",
   },
 ];

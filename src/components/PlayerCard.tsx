@@ -28,10 +28,9 @@ export default function PlayerCard({ player }: { player: Player }) {
         <div className="absolute inset-0 flex flex-col justify-end bg-background/90 p-4 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
           <div className="font-display text-lg tracking-wide text-foreground">{player.name}</div>
           <div className="text-xs uppercase tracking-[0.15em] text-muted">{player.position}</div>
-          <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+          <div className="mt-3 grid grid-cols-2 gap-2 text-center">
             <Stat label="APP" value={player.appearances} />
             <Stat label="G" value={player.goals} />
-            <Stat label="A" value={player.assists} />
           </div>
         </div>
       </div>

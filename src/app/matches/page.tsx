@@ -3,7 +3,7 @@ import PlaceholderImage from "@/components/PlaceholderImage";
 import FixtureRow from "@/components/FixtureRow";
 import MatchResult from "@/components/MatchResult";
 import { images } from "@/data/images";
-import { fixtures, results } from "@/data/matches";
+import { fixtures, resultsByDateDesc } from "@/data/matches";
 
 export const metadata: Metadata = {
   title: "Matches",
@@ -11,8 +11,6 @@ export const metadata: Metadata = {
 };
 
 export default function MatchesPage() {
-  const reversedResults = [...results].reverse();
-
   return (
     <>
       <section className="relative flex h-[46vh] min-h-[320px] items-end overflow-hidden">
@@ -51,7 +49,7 @@ export default function MatchesPage() {
         <div className="mx-auto max-w-4xl px-5 py-16 sm:px-8 sm:py-24">
           <h2 className="font-display text-3xl sm:text-4xl">Results</h2>
           <div className="mt-8 space-y-4">
-            {reversedResults.map((m) => (
+            {resultsByDateDesc.map((m) => (
               <MatchResult key={m.id} match={m} />
             ))}
           </div>

@@ -46,7 +46,7 @@ function sectionImage(key: string, label: string, alt: string): ImageAsset {
 
 export const images = {
   heroHome: sectionImage("hero", "PLACEHOLDER — hero match/action photo", "NY Fanaticos players in action"),
-  champions: sectionImage("champions", "PLACEHOLDER — trophy lift / team celebration photo", "NY Fanaticos celebrating the GroupStage NYC championship"),
+  champions: sectionImage("champions", "PLACEHOLDER — trophy lift / team celebration photo", "NY Fanaticos celebrating the GroupStage D1 championship"),
   clubIntro: sectionImage("club-intro", "PLACEHOLDER — team photo or NYC pitch photo", "NY Fanaticos team photo"),
   clubCity: sectionImage("club-city", "PLACEHOLDER — night match / NYC field photo", "Night match on an NYC field"),
   clubHero: sectionImage("club-hero", "PLACEHOLDER — editorial team portrait", "NY Fanaticos team portrait"),

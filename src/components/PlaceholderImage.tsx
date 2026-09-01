@@ -14,8 +14,8 @@ export default function PlaceholderImage({
   labelClassName?: string;
 }) {
   if (asset.src) {
-    // eslint-disable-next-line @next/next/no-img-element
     return (
+      // eslint-disable-next-line @next/next/no-img-element
       <img
         src={asset.src}
         alt={asset.alt}

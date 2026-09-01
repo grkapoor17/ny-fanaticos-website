@@ -9,6 +9,9 @@ import { latestResult, nextMatch } from "@/data/matches";
 import { competitions } from "@/data/competitions";
 import { featuredPlayers } from "@/data/players";
 import { primarySponsor } from "@/data/sponsors";
+import { honours } from "@/data/honours";
+
+const latestHonour = honours[0] ?? null;
 
 export default function Home() {
   return (
@@ -77,7 +80,11 @@ export default function Home() {
         <PlaceholderImage asset={images.champions} className="absolute inset-0 h-full w-full" />
         <div className="absolute inset-0 bg-background/80" />
         <div className="relative z-10 mx-auto max-w-7xl px-5 py-24 text-center sm:px-8 sm:py-32">
-          <p className="text-xs uppercase tracking-[0.3em] text-accent">2026 GroupStage NYC Champions</p>
+          {latestHonour && (
+            <p className="text-xs uppercase tracking-[0.3em] text-accent">
+              {latestHonour.season} {latestHonour.competition} Champions
+            </p>
+          )}
           <h2 className="font-display mt-3 text-5xl leading-[0.9] sm:text-7xl">CHAMPIONS.</h2>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-foreground/80">
             From topping the league-stage group to navigating the knockout rounds, NY Fanaticos

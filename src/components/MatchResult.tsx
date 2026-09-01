@@ -4,6 +4,15 @@ function ScoreValue({ value }: { value: number | null }) {
   return <span>{value ?? "—"}</span>;
 }
 
+function formatDate(date: string | null): string | null {
+  if (!date) return null;
+  return new Date(`${date}T00:00:00`).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
 export default function MatchResult({ match, compact = false }: { match: Match; compact?: boolean }) {
   return (
     <div className="border border-border bg-background-alt p-6 sm:p-8">
@@ -28,8 +37,22 @@ export default function MatchResult({ match, compact = false }: { match: Match; 
         </div>
       </div>
 
+      {formatDate(match.date) && (
+        <div className="mt-4 text-center text-xs uppercase tracking-[0.2em] text-muted">
+          {formatDate(match.date)}
+        </div>
+      )}
+
+      {match.scorers && match.scorers.length > 0 && (
+        <div className="mt-5 text-center text-sm text-foreground/70">
+          {match.scorers
+            .map((s) => (s.goals > 1 ? `${s.name} ${s.goals}` : s.name))
+            .join(", ")}
+        </div>
+      )}
+
       {(match.penaltiesFor !== null || match.note) && (
-        <div className="mt-5 text-center text-sm text-muted">
+        <div className="mt-3 text-center text-sm text-muted">
           {match.penaltiesFor !== null && match.penaltiesAgainst !== null && (
             <p>
               Penalties: {match.penaltiesFor}–{match.penaltiesAgainst}
