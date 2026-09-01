@@ -1,16 +1,8 @@
 import type { Match } from "@/data/matches";
+import { formatDate } from "@/lib/date";
 
 function ScoreValue({ value }: { value: number | null }) {
   return <span>{value ?? "—"}</span>;
-}
-
-function formatDate(date: string | null): string | null {
-  if (!date) return null;
-  return new Date(`${date}T00:00:00`).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
 }
 
 export default function MatchResult({ match, compact = false }: { match: Match; compact?: boolean }) {

@@ -1,10 +1,14 @@
+import Link from "next/link";
 import type { Player } from "@/data/players";
 import { playerImage } from "@/data/images";
 import PlayerPhoto from "./PlayerPhoto";
 
 export default function PlayerCard({ player }: { player: Player }) {
   return (
-    <div className="group relative overflow-hidden border border-border bg-background-alt">
+    <Link
+      href={`/squad/${player.id}`}
+      className="group relative block overflow-hidden border border-border bg-background-alt"
+    >
       <div className="relative aspect-[3/4]">
         <PlayerPhoto asset={playerImage(player.id)} className="h-full w-full" />
 
@@ -34,7 +38,7 @@ export default function PlayerCard({ player }: { player: Player }) {
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 

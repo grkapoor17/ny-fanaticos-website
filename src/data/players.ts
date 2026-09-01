@@ -9,7 +9,7 @@
  * real ones — update as that info comes in.
  */
 
-import { results } from "./matches";
+import { results, type Match } from "./matches";
 
 export type Position = "Goalkeeper" | "Defender" | "Midfielder" | "Forward";
 
@@ -97,3 +97,72 @@ export function playersByPosition(position: Position): Player[] {
 }
 
 export const featuredPlayers: Player[] = players.slice(0, 6);
+
+export function getPlayer(id: string): Player | null {
+  return players.find((p) => p.id === id) ?? null;
+}
+
+export type PlayerMatchLine = {
+  match: Match;
+  goals: number;
+};
+
+export type PlayerSeason = {
+  key: string;
+  competition: string;
+  season: string;
+  appearances: number;
+  goals: number;
+  matches: PlayerMatchLine[];
+};
+
+/** Season-by-season breakdown (most recent first), each with per-match detail. */
+export function getPlayerSeasons(id: string): PlayerSeason[] {
+  const aliases = new Set(matchdayAliases[id] ?? []);
+  if (aliases.size === 0) return [];
+
+  const seasons = new Map<string, PlayerSeason>();
+  for (const match of results) {
+    if (!match.lineup?.some((name) => aliases.has(name))) continue;
+
+    const key = `${match.competition} — ${match.season}`;
+    const goals = (match.scorers ?? [])
+      .filter((s) => aliases.has(s.name))
+      .reduce((sum, s) => sum + s.goals, 0);
+
+    let season = seasons.get(key);
+    if (!season) {
+      season = { key, competition: match.competition, season: match.season, appearances: 0, goals: 0, matches: [] };
+      seasons.set(key, season);
+    }
+    season.appearances += 1;
+    season.goals += goals;
+    season.matches.push({ match, goals });
+  }
+
+  for (const season of seasons.values()) {
+    season.matches.sort((a, b) => {
+      if (!a.match.date || !b.match.date) return 0;
+      return a.match.date < b.match.date ? 1 : -1;
+    });
+  }
+
+  return Array.from(seasons.values()).sort((a, b) => {
+    const dateA = a.matches[0]?.match.date ?? "";
+    const dateB = b.matches[0]?.match.date ?? "";
+    return dateA < dateB ? 1 : -1;
+  });
+}
+
+/** Earliest recorded match a player appeared in, or null if none/undated. */
+export function getPlayerDebut(id: string): Match | null {
+  const aliases = new Set(matchdayAliases[id] ?? []);
+  if (aliases.size === 0) return null;
+
+  const appearances = results.filter((m) => m.date && m.lineup?.some((name) => aliases.has(name)));
+  if (appearances.length === 0) return null;
+
+  return appearances.reduce((earliest, m) =>
+    m.date! < earliest.date! ? m : earliest
+  );
+}
