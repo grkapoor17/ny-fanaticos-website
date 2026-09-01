@@ -157,9 +157,20 @@ export default function Home() {
                 <p className="text-xs uppercase tracking-[0.3em] text-muted">Supported By</p>
                 <h2 className="font-display mt-3 text-4xl sm:text-5xl">LYDIA&apos;S</h2>
                 <p className="mt-6 max-w-lg text-lg text-foreground/80">{primarySponsor.description}</p>
-                <span className="mt-6 inline-block text-sm font-semibold uppercase tracking-wide text-muted">
-                  Visit Lydia&apos;s (link coming soon)
-                </span>
+                {primarySponsor.url ? (
+                  <a
+                    href={primarySponsor.url}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="mt-6 inline-block text-sm font-semibold uppercase tracking-wide text-accent"
+                  >
+                    Visit Lydia&apos;s →
+                  </a>
+                ) : (
+                  <span className="mt-6 inline-block text-sm font-semibold uppercase tracking-wide text-muted">
+                    Visit Lydia&apos;s (link coming soon)
+                  </span>
+                )}
               </div>
               <PlaceholderImage asset={images.lydiasLogo} className="aspect-[16/9] w-full" />
             </div>
