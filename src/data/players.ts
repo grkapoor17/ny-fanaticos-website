@@ -21,13 +21,13 @@ export type Player = {
 
 export const players: Player[] = [
   { id: "gautam", name: "Gautam Kapoor", number: 10, position: "Midfielder", appearances: 0, goals: 0, assists: 0, captain: true, active: true },
+  { id: "avi", name: "Avi Jaiswal", number: 17, position: "Defender", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
+  { id: "rev", name: "Revanth Pothana", number: 6, position: "Midfielder", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
   { id: "caleb", name: "Caleb Smith-Salzberg", number: 18, position: "Defender", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
   { id: "onur", name: "Onur Gurol", number: 11, position: "Forward", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
   { id: "ben", name: "Ben Richardson", number: 19, position: "Midfielder", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
   { id: "vikram", name: "Vikram Arun", number: 3, position: "Defender", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
   { id: "sriram", name: "Sriram Chidambaram", number: 33, position: "Goalkeeper", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
-  { id: "avi", name: "Avi Jaiswal", number: 17, position: "Defender", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
-  { id: "rev", name: "Revanth Pothana", number: 6, position: "Midfielder", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
   { id: "varun", name: "Varun Giri", number: 21, position: "Midfielder", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
   { id: "roger", name: "Roger Freites", number: 9, position: "Forward", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
   { id: "miles", name: "Miles Rochester", number: 8, position: "Midfielder", appearances: 0, goals: 0, assists: 0, captain: false, active: true },
