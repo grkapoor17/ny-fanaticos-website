@@ -13,7 +13,7 @@ export const sponsors: Sponsor[] = [
     tier: "primary",
     description:
       "Lydia's supports NY Fanaticos both on and off the pitch and serves as a home base for the team.",
-    url: null,
+    url: "https://lydiasnyc.com/",
   },
 ];
 

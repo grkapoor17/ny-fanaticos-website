@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 export default function Footer() {
@@ -6,7 +7,10 @@ export default function Footer() {
       <div className="mx-auto max-w-7xl px-5 py-14 sm:px-8">
         <div className="grid gap-10 md:grid-cols-4">
           <div>
-            <div className="font-display text-2xl tracking-wide text-foreground">NY FANATICOS</div>
+            <div className="flex items-center gap-2.5 font-display text-2xl tracking-wide text-foreground">
+              <Image src="/images/crest.jpg" alt="" width={32} height={32} className="rounded-full" />
+              NY FANATICOS
+            </div>
             <p className="mt-2 text-sm text-muted">New York City</p>
             <a
               href="https://instagram.com/nyfanaticos"

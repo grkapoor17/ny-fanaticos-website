@@ -23,6 +23,10 @@ export default function ClubPage() {
       {/* WHO WE ARE */}
       <section className="border-t border-border bg-background">
         <div className="mx-auto max-w-3xl px-5 py-16 sm:px-8 sm:py-24">
+          <PlaceholderImage
+            asset={images.crest}
+            className="mx-auto mb-8 block h-28 w-28 rounded-full sm:h-36 sm:w-36"
+          />
           <h2 className="font-display text-3xl sm:text-4xl">Who We Are</h2>
           <p className="mt-6 text-lg text-foreground/80">
             NY Fanaticos is an independent football club based in New York City. The club grew

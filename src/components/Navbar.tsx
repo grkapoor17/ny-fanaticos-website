@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -32,7 +33,8 @@ export default function Navbar() {
       }`}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:px-8">
-        <Link href="/" className="font-display text-2xl tracking-wide text-foreground">
+        <Link href="/" className="flex items-center gap-2.5 font-display text-2xl tracking-wide text-foreground">
+          <Image src="/images/crest.jpg" alt="" width={36} height={36} className="rounded-full" priority />
           NY FANATICOS
         </Link>
 
