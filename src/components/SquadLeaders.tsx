@@ -1,5 +1,7 @@
 import Link from "next/link";
 import type { Player } from "@/data/players";
+import { playerImage } from "@/data/images";
+import PlayerPhoto from "@/components/PlayerPhoto";
 
 function topBy(players: Player[], key: "goals" | "appearances", limit = 5): Player[] {
   return [...players]
@@ -45,6 +47,10 @@ function LeaderList({
             >
               <div className="flex min-w-0 items-center gap-4">
                 <span className="w-4 shrink-0 text-sm text-muted">{i + 1}</span>
+                <PlayerPhoto
+                  asset={playerImage(p.id)}
+                  className="h-9 w-9 shrink-0 overflow-hidden rounded-full sm:h-10 sm:w-10"
+                />
                 <span className="truncate font-display text-base tracking-wide sm:text-lg">{p.name}</span>
                 <span className="shrink-0 text-xs text-muted">#{p.number}</span>
               </div>
