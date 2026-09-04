@@ -48,6 +48,7 @@ const matchdayAliases: Record<string, string[]> = {
   max: ["Max"],
   lucas: ["Lucas"],
   sid: ["Sid"],
+  ugur: ["Ugur"],
 };
 
 const roster: RosterEntry[] = [
@@ -65,6 +66,7 @@ const roster: RosterEntry[] = [
   { id: "max", name: "Max Rochester", number: 7, position: "Forward", captain: false, active: true },
   { id: "lucas", name: "Lucas Vienne", number: 1, position: "Goalkeeper", captain: false, active: true },
   { id: "sid", name: "Siddharth Kapoor", number: 99, position: "Goalkeeper", captain: false, active: true },
+  { id: "ugur", name: "Ugur Gurol", number: 4, position: "Defender", captain: false, active: true },
 ];
 
 function computeStats(id: string): { appearances: number; goals: number } {
