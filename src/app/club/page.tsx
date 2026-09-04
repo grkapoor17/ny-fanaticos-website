@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import PlaceholderImage from "@/components/PlaceholderImage";
-import { images } from "@/data/images";
+import PlayerPhoto from "@/components/PlayerPhoto";
+import { images, staffImage } from "@/data/images";
 import { honours } from "@/data/honours";
+import { staff } from "@/data/staff";
 
 export const metadata: Metadata = {
   title: "Club",
@@ -79,6 +81,33 @@ export default function ClubPage() {
                 </div>
                 <div className="text-sm font-semibold uppercase tracking-wide text-accent">
                   {h.result}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* OFF THE PITCH */}
+      <section className="border-t border-border bg-background">
+        <div className="mx-auto max-w-3xl px-5 py-16 sm:px-8 sm:py-24">
+          <h2 className="font-display text-3xl sm:text-4xl">Off the Pitch</h2>
+          <p className="mt-6 text-lg text-foreground/80">
+            The people running things behind the scenes.
+          </p>
+          <div className="mt-8 grid gap-6 sm:grid-cols-2">
+            {staff.map((s) => (
+              <div
+                key={s.id}
+                className="flex items-center gap-4 border border-border bg-background-alt px-6 py-5"
+              >
+                <PlayerPhoto
+                  asset={staffImage(s.id)}
+                  className="h-16 w-16 shrink-0 overflow-hidden rounded-full"
+                />
+                <div>
+                  <div className="font-display text-xl tracking-wide">{s.name}</div>
+                  <div className="text-sm text-muted">{s.role}</div>
                 </div>
               </div>
             ))}

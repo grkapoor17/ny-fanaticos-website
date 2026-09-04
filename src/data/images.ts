@@ -68,3 +68,12 @@ export function playerImage(playerId: string): ImageAsset {
     alt: `Portrait of ${playerId}`,
   };
 }
+
+/** Same convention as playerImage, for non-playing staff: /public/staff/<staff-id>.(jpg|jpeg|png|webp) */
+export function staffImage(staffId: string): ImageAsset {
+  return {
+    src: resolve("staff", staffId),
+    label: `STAFF PHOTO PLACEHOLDER — ${staffId}`,
+    alt: `Portrait of ${staffId}`,
+  };
+}
