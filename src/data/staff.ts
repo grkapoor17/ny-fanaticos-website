@@ -5,5 +5,5 @@ export type StaffMember = {
 };
 
 export const staff: StaffMember[] = [
-  { id: "reshma", name: "Reshma Ramesh", role: "Editor & Head of Marketing" },
+  { id: "reshma", name: "Reshma Ramesh", role: "Social Media Manager" },
 ];

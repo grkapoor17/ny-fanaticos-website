@@ -99,15 +99,15 @@ export default function ClubPage() {
             {staff.map((s) => (
               <div
                 key={s.id}
-                className="flex items-center gap-4 border border-border bg-background-alt px-6 py-5"
+                className="flex items-center gap-6 border border-border bg-background-alt px-8 py-7"
               >
                 <PlayerPhoto
                   asset={staffImage(s.id)}
-                  className="h-16 w-16 shrink-0 overflow-hidden rounded-full"
+                  className="h-24 w-24 shrink-0 overflow-hidden rounded-full"
                 />
                 <div>
-                  <div className="font-display text-xl tracking-wide">{s.name}</div>
-                  <div className="text-sm text-muted">{s.role}</div>
+                  <div className="font-display text-2xl tracking-wide">{s.name}</div>
+                  <div className="text-base text-muted">{s.role}</div>
                 </div>
               </div>
             ))}
