@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+const FORMSPREE_ENDPOINT = process.env.NEXT_PUBLIC_FORMSPREE_ENDPOINT;
+
 const inputClasses =
   "w-full border border-border bg-background px-4 py-3 text-foreground placeholder:text-muted focus:border-accent focus:outline-none";
 
@@ -9,6 +11,8 @@ const labelClasses = "text-xs uppercase tracking-[0.15em] text-muted";
 
 export default function JoinForm() {
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState(false);
+  const [pending, setPending] = useState(false);
 
   if (submitted) {
     return (
@@ -27,11 +31,28 @@ export default function JoinForm() {
 
   return (
     <form
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault();
-        // V1 placeholder: no backend wired up yet. Point this at a form
-        // service (e.g. Formspree) or an API route once one exists.
-        setSubmitted(true);
+        if (!FORMSPREE_ENDPOINT) {
+          console.error("NEXT_PUBLIC_FORMSPREE_ENDPOINT is not set");
+          setError(true);
+          return;
+        }
+        setPending(true);
+        setError(false);
+        try {
+          const res = await fetch(FORMSPREE_ENDPOINT, {
+            method: "POST",
+            headers: { Accept: "application/json" },
+            body: new FormData(e.currentTarget),
+          });
+          if (!res.ok) throw new Error("Form submission failed");
+          setSubmitted(true);
+        } catch {
+          setError(true);
+        } finally {
+          setPending(false);
+        }
       }}
       className="space-y-6"
     >
@@ -84,11 +105,18 @@ export default function JoinForm() {
         <textarea id="message" name="message" rows={3} className={`mt-2 ${inputClasses}`} />
       </div>
 
+      {error && (
+        <p className="text-sm text-red-500">
+          Something went wrong submitting the form. Please try again or reach out on Instagram.
+        </p>
+      )}
+
       <button
         type="submit"
-        className="inline-block bg-accent px-8 py-3 text-sm font-semibold uppercase tracking-wide text-background transition-opacity hover:opacity-90"
+        disabled={pending}
+        className="inline-block bg-accent px-8 py-3 text-sm font-semibold uppercase tracking-wide text-background transition-opacity hover:opacity-90 disabled:opacity-60"
       >
-        Submit Interest
+        {pending ? "Submitting..." : "Submit Interest"}
       </button>
     </form>
   );
