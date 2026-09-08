@@ -550,14 +550,14 @@ export const results: Match[] = [
 ];
 
 /**
- * No confirmed upcoming fixtures yet (Bowery Premier League D4 2026 Fall
- * and MWChampionship 2026 Fall are both on the schedule but unstarted —
- * see competitions.ts). Add entries here with status: "scheduled" as the
- * schedule is confirmed.
+ * Fall 2026 fixtures/results (Bowery Premier League D4) are sourced live
+ * from the team's Google Sheet — see src/lib/sheetMatches.ts. This array is
+ * for other competitions/seasons not tracked in that sheet (e.g.
+ * MWChampionship 2026 Fall, once scheduled).
  */
 export const fixtures: Match[] = [];
 
-function byDateDesc(a: Match, b: Match): number {
+export function byDateDesc(a: Match, b: Match): number {
   if (!a.date || !b.date) return 0;
   return a.date < b.date ? 1 : -1;
 }

@@ -3,14 +3,21 @@ import PlaceholderImage from "@/components/PlaceholderImage";
 import FixtureRow from "@/components/FixtureRow";
 import ResultsFilter from "@/components/ResultsFilter";
 import { images } from "@/data/images";
-import { fixtures, resultsByDateDesc } from "@/data/matches";
+import { fixtures as staticFixtures, results, byDateDesc } from "@/data/matches";
+import { getSheetMatches } from "@/lib/sheetMatches";
 
 export const metadata: Metadata = {
   title: "Matches",
   description: "Upcoming fixtures and recent results for NY Fanaticos.",
 };
 
-export default function MatchesPage() {
+export default async function MatchesPage() {
+  const sheetMatches = await getSheetMatches();
+  const fixtures = [...staticFixtures, ...sheetMatches.filter((m) => m.status === "scheduled")].sort(
+    (a, b) => -byDateDesc(a, b),
+  );
+  const resultsByDateDesc = [...results, ...sheetMatches.filter((m) => m.status === "final")].sort(byDateDesc);
+
   return (
     <>
       <section className="relative flex h-[46vh] min-h-[320px] items-end overflow-hidden">

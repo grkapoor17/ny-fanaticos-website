@@ -5,7 +5,8 @@ import FixtureRow from "@/components/FixtureRow";
 import PlayerCard from "@/components/PlayerCard";
 import InstagramGrid from "@/components/InstagramGrid";
 import { images } from "@/data/images";
-import { latestResult, nextMatch } from "@/data/matches";
+import { results, fixtures as staticFixtures, byDateDesc } from "@/data/matches";
+import { getSheetMatches } from "@/lib/sheetMatches";
 import { competitions } from "@/data/competitions";
 import { featuredPlayers } from "@/data/players";
 import { primarySponsor } from "@/data/sponsors";
@@ -13,7 +14,15 @@ import { honours } from "@/data/honours";
 
 const latestHonour = honours[0] ?? null;
 
-export default function Home() {
+export default async function Home() {
+  const sheetMatches = await getSheetMatches();
+  const allFixtures = [...staticFixtures, ...sheetMatches.filter((m) => m.status === "scheduled")].sort(
+    (a, b) => -byDateDesc(a, b),
+  );
+  const allResults = [...results, ...sheetMatches.filter((m) => m.status === "final")].sort(byDateDesc);
+  const nextMatch = allFixtures[0] ?? null;
+  const latestResult = allResults[0] ?? null;
+
   return (
     <>
       {/* HERO */}
