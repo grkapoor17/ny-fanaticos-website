@@ -17,7 +17,7 @@ const COMPETITION = "Bowery Premier League D4";
 const SEASON = "2026 Fall";
 const STAGE = "Regular Season";
 
-const REVALIDATE_SECONDS = 3600;
+const REVALIDATE_SECONDS = 60 * 60 * 24; // once a day
 
 type SheetRow = (string | undefined)[];
 
