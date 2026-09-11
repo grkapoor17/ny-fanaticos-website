@@ -550,10 +550,10 @@ export const results: Match[] = [
 ];
 
 /**
- * Fall 2026 fixtures/results (Bowery Premier League D4) are sourced live
- * from the team's Google Sheet — see src/lib/sheetMatches.ts. This array is
- * for other competitions/seasons not tracked in that sheet (e.g.
- * MWChampionship 2026 Fall, once scheduled).
+ * Fall 2026 fixtures/results (Bowery Premier League D4 and MWChampionship)
+ * are sourced live from the team's Google Sheets — see
+ * src/lib/sheetMatches.ts. This array is for any competition/season not
+ * tracked in a sheet.
  */
 export const fixtures: Match[] = [];
 

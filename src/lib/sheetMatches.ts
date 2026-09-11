@@ -1,23 +1,45 @@
 import type { Match, Scorer } from "@/data/matches";
 
 /**
- * Live Fall 2026 fixtures/results, sourced from the team's Google Sheet
- * (one tab per match, named "Match 1", "Match 2", ...). The sheet is the
- * source of truth for this season: fixture details are entered as soon as
- * they're known, then filled in with the score and player stats after the
- * match. Cell positions below match the sheet's fixed per-match template —
- * see that sheet's "Match 1" tab for the layout if this ever needs updating.
+ * Live Fall 2026 fixtures/results, sourced from the team's Google Sheets
+ * (one sheet per competition, one tab per match named "Match 1", "Match 2",
+ * ...). The sheets are the source of truth for these seasons: fixture
+ * details are entered as soon as they're known, then filled in with the
+ * score and player stats after the match. Cell positions below match the
+ * sheets' shared per-match template — see any "Match 1" tab for the layout
+ * if this ever needs updating.
  *
- * The sheet must stay shared as "Anyone with the link – Viewer" so the API
+ * Each sheet must stay shared as "Anyone with the link – Viewer" so the API
  * key (read-only, restricted to the Sheets API) can read it.
  */
 
-const SPREADSHEET_ID = "1coVf_FnAnS0xSz6y7sbnmRWh8jmzc50KopjqGGWU_RA";
-const COMPETITION = "Bowery Premier League D4";
-const SEASON = "2026 Fall";
-const STAGE = "Regular Season";
+type SheetSource = {
+  spreadsheetId: string;
+  competition: string;
+  season: string;
+  stage: string;
+  /** Prefix for generated match ids, e.g. "bowery-fall" -> "bowery-fall-3". */
+  idPrefix: string;
+};
 
-const REVALIDATE_SECONDS = 60; // TEMP: 1 min for testing, revert to 60 * 60 * 24 once verified
+const SOURCES: SheetSource[] = [
+  {
+    spreadsheetId: "1coVf_FnAnS0xSz6y7sbnmRWh8jmzc50KopjqGGWU_RA",
+    competition: "Bowery Premier League D4",
+    season: "2026 Fall",
+    stage: "Regular Season",
+    idPrefix: "bowery-fall",
+  },
+  {
+    spreadsheetId: "1wKofHTucVnkPFvQiGTZEXyKPCDlmYC274G2pbEqRFY0",
+    competition: "MWChampionship",
+    season: "2026 Fall",
+    stage: "Regular Season",
+    idPrefix: "mw-fall",
+  },
+];
+
+const REVALIDATE_SECONDS = 60 * 60; // 1 hour
 
 type SheetRow = (string | undefined)[];
 
@@ -26,7 +48,7 @@ function cell(row: SheetRow | undefined, index: number): string | null {
   return value && value.trim() !== "" ? value.trim() : null;
 }
 
-function parseMatchTab(title: string, values: SheetRow[]): Match | null {
+function parseMatchTab(source: SheetSource, title: string, values: SheetRow[]): Match | null {
   const date = cell(values[1], 2);
   const opponent = cell(values[1], 5);
   if (!date || !opponent) return null; // fixture not confirmed yet
@@ -56,10 +78,10 @@ function parseMatchTab(title: string, values: SheetRow[]): Match | null {
   const matchNumber = title.replace(/[^0-9]/g, "") || "0";
 
   return {
-    id: `bowery-fall-${matchNumber}`,
-    competition: COMPETITION,
-    stage: STAGE,
-    season: SEASON,
+    id: `${source.idPrefix}-${matchNumber}`,
+    competition: source.competition,
+    stage: source.stage,
+    season: source.season,
     date,
     time,
     venue,
@@ -76,13 +98,10 @@ function parseMatchTab(title: string, values: SheetRow[]): Match | null {
   };
 }
 
-export async function getSheetMatches(): Promise<Match[]> {
-  const apiKey = process.env.GOOGLE_SHEETS_API_KEY;
-  if (!apiKey) return [];
-
+async function getMatchesForSource(source: SheetSource, apiKey: string): Promise<Match[]> {
   try {
     const metaRes = await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}?key=${apiKey}&fields=sheets.properties.title`,
+      `https://sheets.googleapis.com/v4/spreadsheets/${source.spreadsheetId}?key=${apiKey}&fields=sheets.properties.title`,
       { next: { revalidate: REVALIDATE_SECONDS } },
     );
     if (!metaRes.ok) return [];
@@ -97,7 +116,7 @@ export async function getSheetMatches(): Promise<Match[]> {
 
     const ranges = matchTitles.map((title) => `ranges=${encodeURIComponent(`'${title}'!A1:K23`)}`).join("&");
     const valuesRes = await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values:batchGet?key=${apiKey}&${ranges}`,
+      `https://sheets.googleapis.com/v4/spreadsheets/${source.spreadsheetId}/values:batchGet?key=${apiKey}&${ranges}`,
       { next: { revalidate: REVALIDATE_SECONDS } },
     );
     if (!valuesRes.ok) return [];
@@ -106,11 +125,19 @@ export async function getSheetMatches(): Promise<Match[]> {
     const matches: Match[] = [];
     matchTitles.forEach((title, i) => {
       const values = data.valueRanges?.[i]?.values ?? [];
-      const match = parseMatchTab(title, values);
+      const match = parseMatchTab(source, title, values);
       if (match) matches.push(match);
     });
     return matches;
   } catch {
     return [];
   }
+}
+
+export async function getSheetMatches(): Promise<Match[]> {
+  const apiKey = process.env.GOOGLE_SHEETS_API_KEY;
+  if (!apiKey) return [];
+
+  const perSource = await Promise.all(SOURCES.map((source) => getMatchesForSource(source, apiKey)));
+  return perSource.flat();
 }
