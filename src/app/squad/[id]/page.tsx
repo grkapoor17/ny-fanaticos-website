@@ -4,11 +4,12 @@ import { notFound } from "next/navigation";
 import PlayerPhoto from "@/components/PlayerPhoto";
 import PlayerSeasonTable from "@/components/PlayerSeasonTable";
 import { playerImage } from "@/data/images";
-import { players, getPlayer, getPlayerSeasons, getPlayerDebut } from "@/data/players";
+import { rosterIds, buildPlayers, getPlayer, getPlayerSeasons, getPlayerDebut } from "@/data/players";
+import { getAllMatches } from "@/lib/matches";
 import { formatDate } from "@/lib/date";
 
 export function generateStaticParams() {
-  return players.map((p) => ({ id: p.id }));
+  return rosterIds.map((id) => ({ id }));
 }
 
 export async function generateMetadata({
@@ -17,7 +18,8 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const player = getPlayer(id);
+  const { results } = await getAllMatches();
+  const player = getPlayer(buildPlayers(results), id);
   if (!player) return {};
   return {
     title: player.name,
@@ -27,11 +29,12 @@ export async function generateMetadata({
 
 export default async function PlayerPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const player = getPlayer(id);
+  const { results } = await getAllMatches();
+  const player = getPlayer(buildPlayers(results), id);
   if (!player) notFound();
 
-  const seasons = getPlayerSeasons(player.id);
-  const debut = getPlayerDebut(player.id);
+  const seasons = getPlayerSeasons(player.id, results);
+  const debut = getPlayerDebut(player.id, results);
 
   return (
     <>

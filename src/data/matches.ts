@@ -561,8 +561,3 @@ export function byDateDesc(a: Match, b: Match): number {
   if (!a.date || !b.date) return 0;
   return a.date < b.date ? 1 : -1;
 }
-
-export const resultsByDateDesc = [...results].sort(byDateDesc);
-
-export const latestResult = resultsByDateDesc[0] ?? null;
-export const nextMatch = fixtures[0] ?? null;

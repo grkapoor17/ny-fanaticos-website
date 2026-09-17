@@ -5,23 +5,19 @@ import FixtureRow from "@/components/FixtureRow";
 import PlayerCard from "@/components/PlayerCard";
 import InstagramGrid from "@/components/InstagramGrid";
 import { images } from "@/data/images";
-import { results, fixtures as staticFixtures, byDateDesc } from "@/data/matches";
-import { getSheetMatches } from "@/lib/sheetMatches";
+import { getAllMatches } from "@/lib/matches";
 import { competitions } from "@/data/competitions";
-import { featuredPlayers } from "@/data/players";
+import { buildPlayers, featuredPlayers } from "@/data/players";
 import { primarySponsor } from "@/data/sponsors";
 import { honours } from "@/data/honours";
 
 const latestHonour = honours[0] ?? null;
 
 export default async function Home() {
-  const sheetMatches = await getSheetMatches();
-  const allFixtures = [...staticFixtures, ...sheetMatches.filter((m) => m.status === "scheduled")].sort(
-    (a, b) => -byDateDesc(a, b),
-  );
-  const allResults = [...results, ...sheetMatches.filter((m) => m.status === "final")].sort(byDateDesc);
-  const nextMatch = allFixtures[0] ?? null;
-  const latestResult = allResults[0] ?? null;
+  const { fixtures, results } = await getAllMatches();
+  const nextMatch = fixtures[0] ?? null;
+  const latestResult = results[0] ?? null;
+  const featured = featuredPlayers(buildPlayers(results));
 
   return (
     <>
@@ -157,7 +153,7 @@ export default async function Home() {
             </Link>
           </div>
           <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-            {featuredPlayers.map((p) => (
+            {featured.map((p) => (
               <PlayerCard key={p.id} player={p} />
             ))}
           </div>

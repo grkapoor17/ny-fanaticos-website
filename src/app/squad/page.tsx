@@ -3,14 +3,18 @@ import PlaceholderImage from "@/components/PlaceholderImage";
 import PlayerCard from "@/components/PlayerCard";
 import SquadLeaders from "@/components/SquadLeaders";
 import { images } from "@/data/images";
-import { players, positionOrder, playersByPosition, squadIsPlaceholder } from "@/data/players";
+import { buildPlayers, positionOrder, playersByPosition, squadIsPlaceholder } from "@/data/players";
+import { getAllMatches } from "@/lib/matches";
 
 export const metadata: Metadata = {
   title: "Squad",
   description: "The NY Fanaticos squad.",
 };
 
-export default function SquadPage() {
+export default async function SquadPage() {
+  const { results } = await getAllMatches();
+  const players = buildPlayers(results);
+
   return (
     <>
       <section className="relative flex h-[46vh] min-h-[320px] items-end overflow-hidden">
@@ -33,7 +37,7 @@ export default function SquadPage() {
           <SquadLeaders players={players} />
 
           {positionOrder.map((position) => {
-            const group = playersByPosition(position);
+            const group = playersByPosition(players, position);
             if (group.length === 0) return null;
             return (
               <div key={position} className="mb-16 last:mb-0">

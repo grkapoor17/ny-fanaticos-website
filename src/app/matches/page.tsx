@@ -3,8 +3,7 @@ import PlaceholderImage from "@/components/PlaceholderImage";
 import FixtureRow from "@/components/FixtureRow";
 import ResultsFilter from "@/components/ResultsFilter";
 import { images } from "@/data/images";
-import { fixtures as staticFixtures, results, byDateDesc } from "@/data/matches";
-import { getSheetMatches } from "@/lib/sheetMatches";
+import { getAllMatches } from "@/lib/matches";
 
 export const metadata: Metadata = {
   title: "Matches",
@@ -12,11 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function MatchesPage() {
-  const sheetMatches = await getSheetMatches();
-  const fixtures = [...staticFixtures, ...sheetMatches.filter((m) => m.status === "scheduled")].sort(
-    (a, b) => -byDateDesc(a, b),
-  );
-  const resultsByDateDesc = [...results, ...sheetMatches.filter((m) => m.status === "final")].sort(byDateDesc);
+  const { fixtures, results: resultsByDateDesc } = await getAllMatches();
 
   return (
     <>
