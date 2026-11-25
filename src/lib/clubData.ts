@@ -40,6 +40,7 @@ type MatchRow = {
   pens_for: number | null;
   pens_against: number | null;
   status: Match["status"];
+  forfeit: boolean;
   note: string | null;
   competitions: { name: string; season: string };
   match_players: { name: string; player_id: string | null; goals: number; lineup_order: number }[];
@@ -66,6 +67,7 @@ function toMatch(row: MatchRow): Match {
     penaltiesFor: row.pens_for,
     penaltiesAgainst: row.pens_against,
     status: row.status,
+    forfeit: row.forfeit,
     note: row.note ?? undefined,
     lineup: lineup.map((p) => p.name),
     squadPlayerIds: lineup.flatMap((p) => (p.player_id ? [p.player_id] : [])),
@@ -95,7 +97,7 @@ export const getClubData = cache(async (): Promise<ClubData> => {
     supabase
       .from("matches")
       .select(
-        "id, stage, match_date, kickoff, venue, opponent, home_away, our_score, opponent_score, pens_for, pens_against, status, note, competitions(name, season), match_players(name, player_id, goals, lineup_order)",
+        "id, stage, match_date, kickoff, venue, opponent, home_away, our_score, opponent_score, pens_for, pens_against, status, forfeit, note, competitions(name, season), match_players(name, player_id, goals, lineup_order)",
       ),
   ]);
 

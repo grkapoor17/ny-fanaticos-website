@@ -32,6 +32,8 @@ export type Match = {
   penaltiesFor: number | null;
   penaltiesAgainst: number | null;
   status: MatchStatus;
+  /** Result awarded without playing (walkover, bye). */
+  forfeit: boolean;
   note?: string;
   /** Everyone who played, by name as recorded on matchday, in lineup order. */
   lineup: string[];
