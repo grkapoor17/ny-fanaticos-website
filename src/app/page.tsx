@@ -5,19 +5,18 @@ import FixtureRow from "@/components/FixtureRow";
 import PlayerCard from "@/components/PlayerCard";
 import InstagramGrid from "@/components/InstagramGrid";
 import { images } from "@/data/images";
-import { getAllMatches } from "@/lib/matches";
-import { competitions } from "@/data/competitions";
-import { buildPlayers, featuredPlayers } from "@/data/players";
+import { getClubData } from "@/lib/clubData";
+import { featuredPlayers } from "@/data/players";
 import { primarySponsor } from "@/data/sponsors";
 import { honours } from "@/data/honours";
 
 const latestHonour = honours[0] ?? null;
 
 export default async function Home() {
-  const { fixtures, results } = await getAllMatches();
+  const { competitions, players, fixtures, results } = await getClubData();
   const nextMatch = fixtures[0] ?? null;
   const latestResult = results[0] ?? null;
-  const featured = featuredPlayers(buildPlayers(results));
+  const featured = featuredPlayers(players);
 
   return (
     <>

@@ -13,18 +13,21 @@ npm run dev
 
 ## Content
 
-Club content (fixtures, results, competitions, squad, honours, sponsors)
-lives in typed data files under `src/data/`, not hardcoded in components —
-this keeps it easy to migrate to a database/CMS later without touching page
-markup.
+Fixtures, results, competitions and the squad (including player photos)
+live in **Supabase**: tables `competitions`, `players`, `matches`,
+`match_players`, and the `player-photos` storage bucket. Schema changes go
+in `supabase/migrations/` and are applied with
+`npx supabase db push --db-url "$SUPABASE_DB_URL"`.
 
-Images are centralized in `src/data/images.ts`. Every entry is currently a
-labeled placeholder (`src: null`) since no real club photography exists yet
-— swap in real files under `/public` and update the corresponding `src` to
-replace them.
+`src/lib/clubData.ts` loads everything; reads are cached under the
+`club-data` tag (revalidated hourly, and immediately on admin edits).
+Player appearances/goals are computed from `match_players`, never stored.
 
-The squad roster in `src/data/players.ts` is also placeholder data
-(`squadIsPlaceholder = true`) until real player info is provided.
+Static content (section images, honours, sponsors, staff) still lives in
+`src/data/` and `/public`.
+
+Env vars: see `.env.local.example`. Vercel needs `NEXT_PUBLIC_SUPABASE_URL`
+and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
 
 ## Deploy
 

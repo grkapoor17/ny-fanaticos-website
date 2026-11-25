@@ -3,8 +3,8 @@ import PlaceholderImage from "@/components/PlaceholderImage";
 import PlayerCard from "@/components/PlayerCard";
 import SquadLeaders from "@/components/SquadLeaders";
 import { images } from "@/data/images";
-import { buildPlayers, positionOrder, playersByPosition, squadIsPlaceholder } from "@/data/players";
-import { getAllMatches } from "@/lib/matches";
+import { positionOrder, playersByPosition } from "@/data/players";
+import { getClubData } from "@/lib/clubData";
 
 export const metadata: Metadata = {
   title: "Squad",
@@ -12,8 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default async function SquadPage() {
-  const { results } = await getAllMatches();
-  const players = buildPlayers(results);
+  const { players } = await getClubData();
 
   return (
     <>
@@ -27,12 +26,6 @@ export default async function SquadPage() {
 
       <section className="border-t border-border bg-background">
         <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 sm:py-24">
-          {squadIsPlaceholder && (
-            <p className="mb-12 border border-dashed border-border bg-background-alt p-4 text-center text-sm text-muted">
-              Full squad list coming soon — the roster below shows placeholder players until real
-              names, numbers, and photos are added.
-            </p>
-          )}
 
           <SquadLeaders players={players} />
 
