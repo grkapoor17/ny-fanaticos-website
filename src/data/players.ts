@@ -26,7 +26,7 @@ export type Player = {
   active: boolean;
 };
 
-type RosterEntry = Omit<Player, "appearances" | "goals">;
+export type RosterEntry = Omit<Player, "appearances" | "goals">;
 
 /**
  * Maps a roster player to the exact name(s) used for them on matchday
@@ -34,13 +34,14 @@ type RosterEntry = Omit<Player, "appearances" | "goals">;
  * else in a match's lineup/scorers (guests, one-off call-ups) is still
  * recorded in match history, just not aggregated onto a squad profile.
  */
-const matchdayAliases: Record<string, string[]> = {
+export const matchdayAliases: Record<string, string[]> = {
   gautam: ["Gautam"],
   avi: ["Avi"],
   rev: ["Revanth"],
   caleb: ["Caleb"],
   onur: ["Onur"],
   ben: ["Ben"],
+  "ben-lindau": ["Ben Lindau"],
   vikram: ["Vikram"],
   sriram: ["Sriram"],
   varun: ["Varun"],
@@ -49,10 +50,10 @@ const matchdayAliases: Record<string, string[]> = {
   max: ["Max"],
   lucas: ["Lucas"],
   sid: ["Sid"],
-  ugur: ["Ugur"],
+  ugur: ["Ugur", "UG"],
 };
 
-const roster: RosterEntry[] = [
+export const roster: RosterEntry[] = [
   { id: "gautam", name: "Gautam Kapoor", number: 10, position: "Midfielder", captain: true, active: true },
   { id: "avi", name: "Avi Jaiswal", number: 17, position: "Defender", captain: false, active: true },
   { id: "rev", name: "Revanth Pothana", number: 6, position: "Midfielder", captain: false, active: true },
@@ -68,6 +69,7 @@ const roster: RosterEntry[] = [
   { id: "lucas", name: "Lucas Vienne", number: 1, position: "Goalkeeper", captain: false, active: true },
   { id: "sid", name: "Siddharth Kapoor", number: 99, position: "Goalkeeper", captain: false, active: true },
   { id: "ugur", name: "Ugur Gurol", number: 4, position: "Defender", captain: false, active: true },
+  { id: "ben-lindau", name: "Ben Lindau", number: 22, position: "Midfielder", captain: false, active: true },
 ];
 
 export const rosterIds: string[] = roster.map((p) => p.id);
