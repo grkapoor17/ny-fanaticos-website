@@ -29,6 +29,13 @@ Static content (section images, honours, sponsors, staff) still lives in
 Env vars: see `.env.local.example`. Vercel needs `NEXT_PUBLIC_SUPABASE_URL`
 and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
 
+## Admin
+
+`/admin` (email + password via Supabase Auth). Only emails in the
+`admins` table can sign in or write; the database rules enforce this,
+not just the UI. Sign-ups are disabled in Supabase: create accounts under
+Authentication → Users, then add the email to `admins`.
+
 ## Deploy
 
 Deployed automatically by Vercel on every push to `main`.
