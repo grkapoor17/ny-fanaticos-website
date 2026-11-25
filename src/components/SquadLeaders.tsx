@@ -48,11 +48,11 @@ function LeaderList({
               <div className="flex min-w-0 items-center gap-4">
                 <span className="w-4 shrink-0 text-sm text-muted">{i + 1}</span>
                 <PlayerPhoto
-                  asset={playerImage(p.id)}
+                  asset={playerImage(p)}
                   className="h-9 w-9 shrink-0 overflow-hidden rounded-full sm:h-10 sm:w-10"
                 />
                 <span className="truncate font-display text-base tracking-wide sm:text-lg">{p.name}</span>
-                <span className="shrink-0 text-xs text-muted">#{p.number}</span>
+                {p.number !== null && <span className="shrink-0 text-xs text-muted">#{p.number}</span>}
               </div>
               <span className="shrink-0 font-display text-lg text-accent">
                 {p[statKey]} <span className="text-xs text-muted">{statLabel}</span>

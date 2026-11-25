@@ -13,9 +13,8 @@ import path from "node:path";
  *   - Section photos: /public/images/<key>.(jpg|jpeg|png|webp)
  *       e.g. /public/images/hero.jpg for the homepage hero
  *   - Instagram grid: /public/images/instagram-1.jpg ... instagram-6.jpg
- *   - Player photos: /public/players/<player-id>.(jpg|jpeg|png|webp)
- *       <player-id> matches the `id` field in src/data/players.ts,
- *       e.g. /public/players/gautam.jpg
+ *   - Player photos are NOT here: they live in Supabase Storage
+ *       (bucket "player-photos"), see playerImage below.
  *
  * This is server-only (uses fs) — only import images.ts from server
  * components (no "use client" files).
@@ -61,15 +60,16 @@ export const images = {
   crest: sectionImage("crest", "CREST PLACEHOLDER", "NY Fanaticos crest"),
 } satisfies Record<string, ImageAsset | ImageAsset[]>;
 
-export function playerImage(playerId: string): ImageAsset {
+/** Player photo from Supabase Storage (Player.photoUrl); null falls back to a silhouette. */
+export function playerImage(player: { name: string; photoUrl: string | null }): ImageAsset {
   return {
-    src: resolve("players", playerId),
-    label: `PLAYER PHOTO PLACEHOLDER — ${playerId}`,
-    alt: `Portrait of ${playerId}`,
+    src: player.photoUrl,
+    label: `PLAYER PHOTO PLACEHOLDER — ${player.name}`,
+    alt: `Portrait of ${player.name}`,
   };
 }
 
-/** Same convention as playerImage, for non-playing staff: /public/staff/<staff-id>.(jpg|jpeg|png|webp) */
+/** Staff photos (still static files): /public/staff/<staff-id>.(jpg|jpeg|png|webp) */
 export function staffImage(staffId: string): ImageAsset {
   return {
     src: resolve("staff", staffId),

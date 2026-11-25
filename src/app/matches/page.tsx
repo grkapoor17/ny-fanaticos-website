@@ -3,7 +3,7 @@ import PlaceholderImage from "@/components/PlaceholderImage";
 import FixtureRow from "@/components/FixtureRow";
 import ResultsFilter from "@/components/ResultsFilter";
 import { images } from "@/data/images";
-import { getAllMatches } from "@/lib/matches";
+import { getClubData } from "@/lib/clubData";
 
 export const metadata: Metadata = {
   title: "Matches",
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function MatchesPage() {
-  const { fixtures, results: resultsByDateDesc } = await getAllMatches();
+  const { fixtures, results: resultsByDateDesc } = await getClubData();
 
   return (
     <>

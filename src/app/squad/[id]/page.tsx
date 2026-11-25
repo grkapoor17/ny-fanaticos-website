@@ -4,12 +4,14 @@ import { notFound } from "next/navigation";
 import PlayerPhoto from "@/components/PlayerPhoto";
 import PlayerSeasonTable from "@/components/PlayerSeasonTable";
 import { playerImage } from "@/data/images";
-import { rosterIds, buildPlayers, getPlayer, getPlayerSeasons, getPlayerDebut } from "@/data/players";
-import { getAllMatches } from "@/lib/matches";
+import { getPlayer, getPlayerSeasons, getPlayerDebut } from "@/data/players";
+import { getClubData } from "@/lib/clubData";
 import { formatDate } from "@/lib/date";
 
-export function generateStaticParams() {
-  return rosterIds.map((id) => ({ id }));
+// Players added after a deploy aren't listed here; they render on first visit (dynamicParams defaults to true).
+export async function generateStaticParams() {
+  const { players } = await getClubData();
+  return players.map((p) => ({ id: p.id }));
 }
 
 export async function generateMetadata({
@@ -18,19 +20,19 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const { results } = await getAllMatches();
-  const player = getPlayer(buildPlayers(results), id);
+  const { players } = await getClubData();
+  const player = getPlayer(players, id);
   if (!player) return {};
   return {
     title: player.name,
-    description: `${player.name} — NY Fanaticos #${player.number}, ${player.position}.`,
+    description: `${player.name} — NY Fanaticos${player.number !== null ? ` #${player.number}` : ""}, ${player.position}.`,
   };
 }
 
 export default async function PlayerPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const { results } = await getAllMatches();
-  const player = getPlayer(buildPlayers(results), id);
+  const { players, results } = await getClubData();
+  const player = getPlayer(players, id);
   if (!player) notFound();
 
   const seasons = getPlayerSeasons(player.id, results);
@@ -49,7 +51,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
 
           <div className="mt-8 grid gap-8 sm:grid-cols-[280px_1fr] sm:items-end sm:gap-12">
             <div className="relative aspect-[3/4] w-full max-w-[280px] overflow-hidden border border-border">
-              <PlayerPhoto asset={playerImage(player.id)} className="h-full w-full" />
+              <PlayerPhoto asset={playerImage(player)} className="h-full w-full" />
               {player.captain && (
                 <div className="absolute right-0 top-0 bg-accent px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-background">
                   Captain
@@ -58,7 +60,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
             </div>
 
             <div>
-              <div className="font-display text-lg text-muted">#{player.number}</div>
+              {player.number !== null && <div className="font-display text-lg text-muted">#{player.number}</div>}
               <h1 className="font-display text-5xl leading-[0.9] sm:text-7xl">{player.name}</h1>
               <p className="mt-2 text-sm uppercase tracking-[0.15em] text-muted">{player.position}</p>
 
