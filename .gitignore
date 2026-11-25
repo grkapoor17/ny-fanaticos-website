@@ -42,3 +42,6 @@ next-env.d.ts
 
 # iCloud: keep generated dirs out of sync
 *.nosync
+
+# supabase CLI local state
+supabase/.temp
