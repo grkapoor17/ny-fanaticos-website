@@ -69,7 +69,7 @@ export const roster: RosterEntry[] = [
   { id: "lucas", name: "Lucas Vienne", number: 1, position: "Goalkeeper", captain: false, active: true },
   { id: "sid", name: "Siddharth Kapoor", number: 99, position: "Goalkeeper", captain: false, active: true },
   { id: "ugur", name: "Ugur Gurol", number: 4, position: "Defender", captain: false, active: true },
-  { id: "ben-lindau", name: "Ben Lindau", number: 21, position: "Midfielder", captain: false, active: true },
+  { id: "ben-lindau", name: "Ben Lindau", number: 22, position: "Midfielder", captain: false, active: true },
 ];
 
 export const rosterIds: string[] = roster.map((p) => p.id);
