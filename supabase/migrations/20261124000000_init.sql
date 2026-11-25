@@ -97,6 +97,12 @@ language sql stable security definer set search_path = '' as $$
   );
 $$;
 
+-- Table-level grants (explicit so we don't depend on the project's
+-- "grant API access automatically" setting). RLS below decides which rows.
+grant select on public.competitions, public.players, public.matches, public.match_players to anon, authenticated;
+grant insert, update, delete on public.competitions, public.players, public.matches, public.match_players to authenticated;
+revoke all on public.admins from anon, authenticated;
+
 alter table public.competitions  enable row level security;
 alter table public.players       enable row level security;
 alter table public.matches       enable row level security;
