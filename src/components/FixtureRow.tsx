@@ -1,4 +1,5 @@
 import type { Match } from "@/data/matches";
+import { formatDate } from "@/lib/date";
 
 export default function FixtureRow({ match }: { match: Match }) {
   return (
@@ -23,7 +24,7 @@ export default function FixtureRow({ match }: { match: Match }) {
       <div className="mt-6 grid grid-cols-2 gap-3 text-sm text-muted sm:grid-cols-4">
         <div>
           <div className="text-xs uppercase tracking-[0.15em]">Date</div>
-          <div className="mt-1 text-foreground/90">{match.date ?? "TBD"}</div>
+          <div className="mt-1 text-foreground/90">{formatDate(match.date) ?? "TBD"}</div>
         </div>
         <div>
           <div className="text-xs uppercase tracking-[0.15em]">Time</div>

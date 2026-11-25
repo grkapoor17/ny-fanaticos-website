@@ -151,3 +151,159 @@ export async function unlinkName(formData: FormData): Promise<void> {
   }
   redirect(`/admin/players/${playerId}`);
 }
+
+// ---------------------------------------------------------------------------
+// Matches
+// ---------------------------------------------------------------------------
+
+export type LineupEntry = { name: string; player_id: string | null; goals: number };
+
+function optionalInt(raw: string, label: string, { min = 0, max = 999 } = {}): number | null | string {
+  if (!raw) return null;
+  const n = Number(raw);
+  if (!Number.isInteger(n) || n < min || n > max) return `${label} must be a whole number ${min}–${max}.`;
+  return n;
+}
+
+export async function saveMatch(_prev: FormState, formData: FormData): Promise<FormState> {
+  const { supabase } = await requireAdmin();
+
+  const id = text(formData, "id") || null;
+  const competitionId = text(formData, "competition_id");
+  const opponent = text(formData, "opponent");
+  const status = text(formData, "status") === "final" ? "final" : "scheduled";
+  const homeAway = text(formData, "home_away") || null;
+  const matchDate = text(formData, "match_date") || null;
+
+  if (!competitionId) return { error: "Pick a competition." };
+  if (!opponent) return { error: "Opponent is required." };
+  if (homeAway && !["home", "away", "neutral"].includes(homeAway)) return { error: "Invalid home/away value." };
+  if (matchDate && !/^\d{4}-\d{2}-\d{2}$/.test(matchDate)) return { error: "Invalid date." };
+
+  const ints: Record<string, number | null> = {};
+  for (const [key, label] of [
+    ["our_score", "Our score"],
+    ["opponent_score", "Their score"],
+    ["pens_for", "Our penalties"],
+    ["pens_against", "Their penalties"],
+  ] as const) {
+    const v = optionalInt(text(formData, key), label);
+    if (typeof v === "string") return { error: v };
+    ints[key] = v;
+  }
+
+  let lineup: LineupEntry[] = [];
+  if (status === "final") {
+    if (ints.our_score === null || ints.opponent_score === null) return { error: "Enter both scores to save a result." };
+    if ((ints.pens_for === null) !== (ints.pens_against === null)) return { error: "Enter both penalty scores, or neither." };
+    try {
+      const parsed = JSON.parse(String(formData.get("lineup") ?? "[]")) as LineupEntry[];
+      lineup = parsed.map((e) => ({
+        name: String(e.name ?? "").trim(),
+        player_id: e.player_id ? String(e.player_id) : null,
+        goals: Number(e.goals) || 0,
+      }));
+    } catch {
+      return { error: "Couldn't read the lineup. Reload the page and try again." };
+    }
+    const seen = new Set<string>();
+    for (const e of lineup) {
+      if (!e.name) return { error: "Every guest needs a name." };
+      if (e.name.length > 60) return { error: `"${e.name.slice(0, 20)}…" is too long for a name.` };
+      if (!Number.isInteger(e.goals) || e.goals < 0 || e.goals > 30) return { error: `Goals for ${e.name} must be a whole number.` };
+      const key = e.name.toLowerCase();
+      if (seen.has(key)) return { error: `"${e.name}" is in the lineup twice. Give guests distinct names (e.g. "Sam" and "Sam K").` };
+      seen.add(key);
+    }
+  } else {
+    // A fixture has no score or lineup yet.
+    ints.our_score = ints.opponent_score = ints.pens_for = ints.pens_against = null;
+  }
+
+  const match = {
+    ...(id ? { id } : {}),
+    competition_id: competitionId,
+    stage: text(formData, "stage") || "Regular Season",
+    match_date: matchDate,
+    kickoff: text(formData, "kickoff") || null,
+    venue: text(formData, "venue") || null,
+    opponent,
+    home_away: homeAway,
+    ...ints,
+    status,
+    forfeit: status === "final" && formData.get("forfeit") === "on",
+    note: text(formData, "note") || null,
+  };
+
+  const { error } = await supabase.rpc("save_match", { p_match: match, p_lineup: lineup });
+  if (error) return { error: `Couldn't save: ${error.message}` };
+
+  updateTag(CLUB_DATA_TAG);
+  redirect("/admin/matches");
+}
+
+export async function deleteMatch(_prev: FormState, formData: FormData): Promise<FormState> {
+  const { supabase } = await requireAdmin();
+  if (formData.get("confirm") !== "on") return { error: "Tick the box to confirm." };
+  const { data, error } = await supabase.from("matches").delete().eq("id", text(formData, "id")).select("id");
+  if (error) return { error: `Couldn't delete: ${error.message}` };
+  if (!data?.length) return { error: "Couldn't delete: match not found." };
+  updateTag(CLUB_DATA_TAG);
+  redirect("/admin/matches");
+}
+
+// ---------------------------------------------------------------------------
+// Competitions (a league/cup in a given season)
+// ---------------------------------------------------------------------------
+
+function slug(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+export async function saveCompetition(_prev: FormState, formData: FormData): Promise<FormState> {
+  const { supabase } = await requireAdmin();
+  const existingId = text(formData, "id");
+  const name = text(formData, "name");
+  const season = text(formData, "season");
+  const startsOn = text(formData, "starts_on") || null;
+  if (!name) return { error: "Name is required." };
+  if (!season) return { error: 'Season is required (e.g. "2027 Spring").' };
+  if (startsOn && !/^\d{4}-\d{2}-\d{2}$/.test(startsOn)) return { error: "Invalid start date." };
+
+  const row = {
+    name,
+    season,
+    status: text(formData, "status") || "Upcoming",
+    summary: text(formData, "summary"),
+    starts_on: startsOn,
+  };
+
+  const { error } = existingId
+    ? await supabase.from("competitions").update(row).eq("id", existingId)
+    : await supabase.from("competitions").insert({ id: slug(`${name} ${season}`), ...row });
+  if (error) {
+    if (error.code === "23505") return { error: `${name} — ${season} already exists.` };
+    return { error: `Couldn't save: ${error.message}` };
+  }
+
+  updateTag(CLUB_DATA_TAG);
+  redirect("/admin/competitions");
+}
+
+export async function deleteCompetition(_prev: FormState, formData: FormData): Promise<FormState> {
+  const { supabase } = await requireAdmin();
+  if (formData.get("confirm") !== "on") return { error: "Tick the box to confirm." };
+  const { data, error } = await supabase.from("competitions").delete().eq("id", text(formData, "id")).select("id");
+  if (error) {
+    if (error.code === "23503") return { error: "This competition still has matches. Delete or move them first." };
+    return { error: `Couldn't delete: ${error.message}` };
+  }
+  if (!data?.length) return { error: "Couldn't delete: competition not found." };
+  updateTag(CLUB_DATA_TAG);
+  redirect("/admin/competitions");
+}

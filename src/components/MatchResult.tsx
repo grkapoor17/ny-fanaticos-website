@@ -29,9 +29,10 @@ export default function MatchResult({ match, compact = false }: { match: Match; 
         </div>
       </div>
 
-      {formatDate(match.date) && (
+      {(formatDate(match.date) || match.forfeit) && (
         <div className="mt-4 text-center text-xs uppercase tracking-[0.2em] text-muted">
           {formatDate(match.date)}
+          {match.forfeit && <span className="ml-2 border border-border px-2 py-0.5 text-[10px]">Forfeit</span>}
         </div>
       )}
 

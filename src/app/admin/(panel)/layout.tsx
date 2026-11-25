@@ -22,8 +22,14 @@ export default async function AdminPanelLayout({ children }: { children: React.R
           <Link href="/admin" className="hover:text-accent">
             Admin
           </Link>
+          <Link href="/admin/matches" className="hover:text-accent">
+            Matches
+          </Link>
           <Link href="/admin/players" className="hover:text-accent">
             Players
+          </Link>
+          <Link href="/admin/competitions" className="hover:text-accent">
+            Competitions
           </Link>
         </nav>
         <div className="flex items-center gap-4 text-xs text-muted">
