@@ -23,14 +23,6 @@ import { getSheetMatches } from "../src/lib/sheetMatches";
 const DRY_RUN = process.argv.includes("--dry-run");
 const EXPECTED_SHEET_MATCHES = 18; // Fall 2026 as of Nov 24 2026 (9 Bowery + 9 MW)
 
-/**
- * Matchday names that weren't in players.ts' alias map but are the same
- * person. Confirm with the club before adding anything here.
- */
-const EXTRA_ALIASES: Record<string, string[]> = {
-  ugur: ["UG"],
-};
-
 const PHOTO_BUCKET = "player-photos";
 const PHOTO_EXTENSIONS = ["jpg", "jpeg", "png", "webp"] as const;
 const CONTENT_TYPES: Record<string, string> = { jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", webp: "image/webp" };
@@ -60,8 +52,8 @@ async function main() {
   const allMatches: Match[] = [...staticResults, ...staticFixtures, ...sheetMatches];
 
   const nameToPlayerId = new Map<string, string>();
-  for (const [playerId, names] of Object.entries({ ...matchdayAliases })) {
-    for (const name of [...names, ...(EXTRA_ALIASES[playerId] ?? [])]) nameToPlayerId.set(name, playerId);
+  for (const [playerId, names] of Object.entries(matchdayAliases)) {
+    for (const name of names) nameToPlayerId.set(name, playerId);
   }
 
   const competitionIdByKey = new Map(competitions.map((c) => [`${c.name}|${c.season}`, c.id]));

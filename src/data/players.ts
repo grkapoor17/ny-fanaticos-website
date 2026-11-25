@@ -41,6 +41,7 @@ export const matchdayAliases: Record<string, string[]> = {
   caleb: ["Caleb"],
   onur: ["Onur"],
   ben: ["Ben"],
+  "ben-lindau": ["Ben Lindau"],
   vikram: ["Vikram"],
   sriram: ["Sriram"],
   varun: ["Varun"],
@@ -49,7 +50,7 @@ export const matchdayAliases: Record<string, string[]> = {
   max: ["Max"],
   lucas: ["Lucas"],
   sid: ["Sid"],
-  ugur: ["Ugur"],
+  ugur: ["Ugur", "UG"],
 };
 
 export const roster: RosterEntry[] = [
@@ -68,6 +69,7 @@ export const roster: RosterEntry[] = [
   { id: "lucas", name: "Lucas Vienne", number: 1, position: "Goalkeeper", captain: false, active: true },
   { id: "sid", name: "Siddharth Kapoor", number: 99, position: "Goalkeeper", captain: false, active: true },
   { id: "ugur", name: "Ugur Gurol", number: 4, position: "Defender", captain: false, active: true },
+  { id: "ben-lindau", name: "Ben Lindau", number: 21, position: "Midfielder", captain: false, active: true },
 ];
 
 export const rosterIds: string[] = roster.map((p) => p.id);
