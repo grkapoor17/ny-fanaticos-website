@@ -8,6 +8,7 @@
  */
 
 import { createClient } from "@supabase/supabase-js";
+import ws from "ws"; // Node 20 has no native WebSocket, which supabase-js requires
 import { competitions } from "../src/data/competitions";
 import { fixtures as staticFixtures, results as staticResults, type Match } from "../src/data/matches";
 import { buildPlayers, roster } from "../src/data/players";
@@ -33,6 +34,9 @@ function requireEnv(name: string): string {
 async function main() {
   const supabase = createClient(requireEnv("NEXT_PUBLIC_SUPABASE_URL"), requireEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY"), {
     auth: { persistSession: false },
+    // ws works at runtime; its types just don't match supabase-js's WebSocket interface.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    realtime: { transport: ws as any },
   });
   const problems: string[] = [];
   const notes: string[] = [];

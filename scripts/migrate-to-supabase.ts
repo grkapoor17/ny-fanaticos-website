@@ -14,6 +14,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { createClient } from "@supabase/supabase-js";
+import ws from "ws"; // Node 20 has no native WebSocket, which supabase-js requires
 import { competitions } from "../src/data/competitions";
 import { fixtures as staticFixtures, results as staticResults, type Match } from "../src/data/matches";
 import { matchdayAliases, roster } from "../src/data/players";
@@ -158,6 +159,9 @@ async function main() {
   // ---- Write (order matters for foreign keys) ------------------------------
   const supabase = createClient(requireEnv("NEXT_PUBLIC_SUPABASE_URL"), requireEnv("SUPABASE_SERVICE_ROLE_KEY"), {
     auth: { persistSession: false },
+    // ws works at runtime; its types just don't match supabase-js's WebSocket interface.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    realtime: { transport: ws as any },
   });
 
   for (const p of playerRows) {
