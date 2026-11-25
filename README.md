@@ -36,6 +36,12 @@ and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
 not just the UI. Sign-ups are disabled in Supabase: create accounts under
 Authentication → Users, then add the email to `admins`.
 
+**Squads & fees** (`/admin/squads`) tracks who joined each competition's
+squad and what they've paid. It's private: the `competition_fees`,
+`squad_members` and `squad_payments` tables are readable by admins only.
+The league fee is split into shares (full = 1, half = ½) after any
+custom amounts, rounded up to the dollar.
+
 ## Deploy
 
 Deployed automatically by Vercel on every push to `main`.

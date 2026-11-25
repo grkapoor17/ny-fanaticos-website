@@ -18,7 +18,7 @@ export default async function AdminPanelLayout({ children }: { children: React.R
   return (
     <div className="mx-auto max-w-5xl px-5 pb-24 pt-28 sm:px-8">
       <header className="mb-10 flex flex-wrap items-center justify-between gap-4 border-b border-border pb-4">
-        <nav className="flex gap-6 text-sm font-semibold uppercase tracking-wide">
+        <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold uppercase tracking-wide">
           <Link href="/admin" className="hover:text-accent">
             Admin
           </Link>
@@ -30,6 +30,9 @@ export default async function AdminPanelLayout({ children }: { children: React.R
           </Link>
           <Link href="/admin/competitions" className="hover:text-accent">
             Competitions
+          </Link>
+          <Link href="/admin/squads" className="hover:text-accent">
+            Squads
           </Link>
         </nav>
         <div className="flex items-center gap-4 text-xs text-muted">

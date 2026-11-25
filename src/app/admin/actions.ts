@@ -1,14 +1,15 @@
 "use server";
 
-import { updateTag } from "next/cache";
+import { refresh, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import type { Position } from "@/data/players";
 import { CLUB_DATA_TAG } from "@/lib/supabase";
+import { PAYMENT_METHODS, parseMoney, type FeeType } from "@/lib/squadFees";
 import { PLAYER_PHOTO_BUCKET } from "@/lib/storage";
 import { createSessionClient, requireAdmin } from "@/lib/supabaseServer";
 
 /** Returned to forms (via useActionState) when something needs fixing. */
-export type FormState = { error?: string } | undefined;
+export type FormState = { error?: string; message?: string } | undefined;
 
 const POSITIONS: Position[] = ["Goalkeeper", "Defender", "Midfielder", "Forward"];
 const PLAYER_ID_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
@@ -118,7 +119,12 @@ export async function deletePlayer(_prev: FormState, formData: FormData): Promis
   if (formData.get("confirm") !== "on") return { error: "Tick the box to confirm." };
 
   const { data, error } = await supabase.from("players").delete().eq("id", id).select("photo_path");
-  if (error) return { error: `Couldn't delete: ${error.message}` };
+  if (error) {
+    if (error.code === "23503") {
+      return { error: "This player is in a competition squad (Squads & fees). Remove them there first, or just untick Active instead." };
+    }
+    return { error: `Couldn't delete: ${error.message}` };
+  }
   const photoPath = data?.[0]?.photo_path as string | null | undefined;
   if (photoPath) await supabase.storage.from(PLAYER_PHOTO_BUCKET).remove([photoPath]);
 
@@ -300,10 +306,145 @@ export async function deleteCompetition(_prev: FormState, formData: FormData): P
   if (formData.get("confirm") !== "on") return { error: "Tick the box to confirm." };
   const { data, error } = await supabase.from("competitions").delete().eq("id", text(formData, "id")).select("id");
   if (error) {
-    if (error.code === "23503") return { error: "This competition still has matches. Delete or move them first." };
+    if (error.code === "23503") {
+      return { error: "This competition still has matches or squad payments. Delete or move those first." };
+    }
     return { error: `Couldn't delete: ${error.message}` };
   }
   if (!data?.length) return { error: "Couldn't delete: competition not found." };
   updateTag(CLUB_DATA_TAG);
   redirect("/admin/competitions");
+}
+
+// ---------------------------------------------------------------------------
+// Squads & fees (private: never shown on the public site, so no cache tag)
+// ---------------------------------------------------------------------------
+
+const FEE_TYPE_VALUES: FeeType[] = ["full", "half", "custom"];
+
+/** Reads fee_type + custom_fee from a form; returns an error string if invalid. */
+function readFee(formData: FormData): { fee_type: FeeType; custom_fee_cents: number | null } | string {
+  const feeType = text(formData, "fee_type") as FeeType;
+  if (!FEE_TYPE_VALUES.includes(feeType)) return "Pick full, half or custom.";
+  if (feeType !== "custom") return { fee_type: feeType, custom_fee_cents: null };
+  const cents = parseMoney(text(formData, "custom_fee"));
+  if (cents === null || cents < 0) return "Enter the custom amount in dollars (e.g. 50).";
+  return { fee_type: "custom", custom_fee_cents: cents };
+}
+
+export async function saveLeagueFee(_prev: FormState, formData: FormData): Promise<FormState> {
+  const { supabase } = await requireAdmin();
+  const competitionId = text(formData, "competition_id");
+  const cents = parseMoney(text(formData, "league_fee"));
+  if (cents === null || cents < 0) return { error: "Enter the league fee in dollars (e.g. 1600)." };
+  const { error } = await supabase
+    .from("competition_fees")
+    .upsert({ competition_id: competitionId, league_fee_cents: cents }, { onConflict: "competition_id" });
+  if (error) return { error: `Couldn't save: ${error.message}` };
+  refresh();
+  return { message: "Saved." };
+}
+
+export async function addSquadMembers(_prev: FormState, formData: FormData): Promise<FormState> {
+  const { supabase } = await requireAdmin();
+  const competitionId = text(formData, "competition_id");
+  const playerIds = formData.getAll("player_id").map(String).filter(Boolean);
+  if (!playerIds.length) return { error: "Tick at least one player." };
+  const fee = readFee(formData);
+  if (typeof fee === "string") return { error: fee };
+
+  const { error } = await supabase
+    .from("squad_members")
+    .upsert(playerIds.map((player_id) => ({ competition_id: competitionId, player_id, ...fee })), {
+      onConflict: "competition_id,player_id",
+      ignoreDuplicates: true,
+    });
+  if (error) return { error: `Couldn't add: ${error.message}` };
+  refresh();
+  return { message: `Added ${playerIds.length} player${playerIds.length === 1 ? "" : "s"}.` };
+}
+
+/** Adds everyone from another competition's squad (same fee types; no payments). */
+export async function copySquad(_prev: FormState, formData: FormData): Promise<FormState> {
+  const { supabase } = await requireAdmin();
+  const competitionId = text(formData, "competition_id");
+  const fromId = text(formData, "from_competition_id");
+  if (!fromId) return { error: "Pick a competition to copy from." };
+  const { data, error } = await supabase
+    .from("squad_members")
+    .select("player_id, fee_type, custom_fee_cents")
+    .eq("competition_id", fromId);
+  if (error) return { error: `Couldn't copy: ${error.message}` };
+  if (!data?.length) return { error: "That squad is empty." };
+  const { error: insertError } = await supabase
+    .from("squad_members")
+    .upsert(data.map((m) => ({ ...m, competition_id: competitionId })), {
+      onConflict: "competition_id,player_id",
+      ignoreDuplicates: true,
+    });
+  if (insertError) return { error: `Couldn't copy: ${insertError.message}` };
+  refresh();
+  return { message: `Copied ${data.length} player${data.length === 1 ? "" : "s"} (anyone already here was left as is).` };
+}
+
+export async function updateSquadMember(_prev: FormState, formData: FormData): Promise<FormState> {
+  const { supabase } = await requireAdmin();
+  const fee = readFee(formData);
+  if (typeof fee === "string") return { error: fee };
+  const { data, error } = await supabase
+    .from("squad_members")
+    .update({ ...fee, note: text(formData, "note") || null })
+    .eq("competition_id", text(formData, "competition_id"))
+    .eq("player_id", text(formData, "player_id"))
+    .select("player_id");
+  if (error) return { error: `Couldn't save: ${error.message}` };
+  if (!data?.length) return { error: "Couldn't save: not in this squad any more." };
+  refresh();
+  return { message: "Saved." };
+}
+
+export async function removeSquadMember(_prev: FormState, formData: FormData): Promise<FormState> {
+  const { supabase } = await requireAdmin();
+  const { error } = await supabase
+    .from("squad_members")
+    .delete()
+    .eq("competition_id", text(formData, "competition_id"))
+    .eq("player_id", text(formData, "player_id"));
+  if (error) {
+    if (error.code === "23503") return { error: "They have payments recorded. Delete those first (or refund them)." };
+    return { error: `Couldn't remove: ${error.message}` };
+  }
+  refresh();
+  return undefined;
+}
+
+export async function recordPayment(_prev: FormState, formData: FormData): Promise<FormState> {
+  const { supabase } = await requireAdmin();
+  const playerId = text(formData, "player_id");
+  const cents = parseMoney(text(formData, "amount"));
+  const paidOn = text(formData, "paid_on");
+  const method = text(formData, "method") || null;
+  if (!playerId) return { error: "Pick who paid." };
+  if (cents === null || cents === 0) return { error: "Enter an amount in dollars (negative for a refund)." };
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(paidOn)) return { error: "Pick the date it was paid." };
+  if (method && !PAYMENT_METHODS.includes(method)) return { error: "Pick a payment method." };
+
+  const { error } = await supabase.from("squad_payments").insert({
+    competition_id: text(formData, "competition_id"),
+    player_id: playerId,
+    amount_cents: cents,
+    paid_on: paidOn,
+    method,
+    note: text(formData, "note") || null,
+  });
+  if (error) return { error: `Couldn't record: ${error.message}` };
+  refresh();
+  return { message: "Payment recorded." };
+}
+
+export async function deletePayment(formData: FormData): Promise<void> {
+  const { supabase } = await requireAdmin();
+  const { error } = await supabase.from("squad_payments").delete().eq("id", text(formData, "id"));
+  if (error) throw new Error(`Couldn't delete payment: ${error.message}`);
+  refresh();
 }
