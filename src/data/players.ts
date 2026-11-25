@@ -57,7 +57,7 @@ export function playersByPosition(players: Player[], position: Position): Player
 }
 
 export function featuredPlayers(players: Player[]): Player[] {
-  return players.slice(0, 6);
+  return players.filter((p) => p.active).slice(0, 6);
 }
 
 export function getPlayer(players: Player[], id: string): Player | null {

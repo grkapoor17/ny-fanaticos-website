@@ -12,7 +12,8 @@ export const metadata: Metadata = {
 };
 
 export default async function SquadPage() {
-  const { players } = await getClubData();
+  // Inactive (retired) players keep their profile page but aren't listed here.
+  const players = (await getClubData()).players.filter((p) => p.active);
 
   return (
     <>

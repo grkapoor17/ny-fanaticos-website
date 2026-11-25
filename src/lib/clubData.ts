@@ -2,7 +2,8 @@ import { cache } from "react";
 import type { Competition } from "@/data/competitions";
 import { byDateDesc, type Match, type Scorer } from "@/data/matches";
 import { buildPlayers, type Player, type Position, type RosterEntry } from "@/data/players";
-import { createPublicClient, playerPhotoUrl } from "@/lib/supabase";
+import { createPublicClient } from "@/lib/supabase";
+import { playerPhotoUrl } from "@/lib/storage";
 
 export type ClubData = {
   competitions: Competition[];
